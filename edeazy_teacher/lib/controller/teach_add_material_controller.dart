@@ -7,8 +7,7 @@ import 'package:edeazy_teacher/services/services.dart';
 class AddMaterialControler extends GetxController {
   var g = GetStorage();
   var token = ''.obs;
-  var clas = ''.obs;
-  var subject = ''.obs;
+  var classId = ''.obs;
   var type = ''.obs;
 
   @override
@@ -48,6 +47,7 @@ class AddMaterialControler extends GetxController {
     required String chapno,
     required String chapname,
     required String topic,
+    required String link,
   }) async {
     try {
       if (file.isEmpty) {
@@ -60,8 +60,8 @@ class AddMaterialControler extends GetxController {
           chapname: chapname,
           chapno: chapno,
           topic: topic,
-          clas: clas.value,
-          subject: subject.value);
+          link:link,
+          classId: classId.value);
       Get.back();
       toast(message: 'Added Successfully', title: '');
     } catch (e) {
@@ -86,8 +86,7 @@ class AddMaterialControler extends GetxController {
           fileid: file['id'],
           token: token.value,
           topicname: topic,
-          clas: clas.value,
-          subject: subject.value);
+          classId: classId.value);
       Get.back();
       toast(message: '$type Added Successfully', title: '');
     } catch (e) {

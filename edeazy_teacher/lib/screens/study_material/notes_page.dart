@@ -113,7 +113,7 @@ class TeacherNotes extends StatelessWidget {
         }
         return Center(
           child: Text(
-            'No Data',
+            'No Notes',
             style: Theme.of(context).textTheme.headline2,
           ),
         );

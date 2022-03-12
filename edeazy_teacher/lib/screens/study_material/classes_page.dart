@@ -54,7 +54,8 @@ class _StudyMaterial extends State<StudyMaterial> {
                       : 2,
                   crossAxisSpacing: 20,
                   mainAxisSpacing: 20,
-                  childAspectRatio: 3 / 2),
+                  childAspectRatio: 3 / 2
+                  ),
               itemBuilder: (context, item) {
                 return Padding(
                   padding: const EdgeInsets.all(5.0),
@@ -73,8 +74,11 @@ class _StudyMaterial extends State<StudyMaterial> {
     return GestureDetector(
       onTap: () {
         g.clas(g.classlist[item].teacherClass);
-        g.subject(g.classlist[item].subject[0]);
-        Get.toNamed('/study', arguments: g.classlist[item].subject);
+        g.stream(g.classlist[item].stream); 
+        g.subjects(g.classlist[item].subjects);
+        g.name(g.classlist[item].subjects[0].name);
+        g.classId(g.classlist[item].subjects[0].classId);
+        Get.toNamed('/study', arguments: g.classlist[item].subjects);
       },
       child: Container(
         padding: EdgeInsets.all(15),
@@ -86,9 +90,9 @@ class _StudyMaterial extends State<StudyMaterial> {
         ),
         child: Center(
           child: Text(
-            'Class ${g.classlist[item].teacherClass}th',
+            'Class ${g.classlist[item].teacherClass}th ${g.classlist[item].stream}',
             style: TextStyle(
-              fontSize: 25,
+              fontSize: 20,
               fontWeight: Theme.of(context).textTheme.headline2!.fontWeight,
               color: bodycolor,
             ),

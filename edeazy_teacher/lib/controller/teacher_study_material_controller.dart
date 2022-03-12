@@ -8,8 +8,11 @@ class StudyController extends GetxController {
   var g = GetStorage();
   var token = ''.obs;
   var clas = ''.obs;
-  var subject = ''.obs;
+  var subjects = <Subject>[].obs;
+  var name =''.obs;
   var chapterId = ''.obs;
+  var classId = ''.obs;
+  var stream = ''.obs;
   @override
   void onInit() {
     token(g.read('token') ?? '');
@@ -55,7 +58,7 @@ class StudyController extends GetxController {
     loadingNote(true);
     try {
       var n = await Services.fetchNotes(
-          token: token.value, subj: subject.value, clas: clas.value);
+          token: token.value, classId: classId.value);
       notes = n;
       loadingNote(false);
       update();
@@ -77,8 +80,7 @@ class StudyController extends GetxController {
     try {
       var n = await Services.fetchWork(
           token: token.value,
-          clas: clas.value,
-          subj: subject.value,
+          classId: classId.value,
           smat: smat);
       if (smat == 'Assignment') {
         assignment = n;

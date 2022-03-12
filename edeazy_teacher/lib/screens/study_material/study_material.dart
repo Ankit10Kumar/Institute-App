@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields
 
+import 'package:edeazy_teacher/modals/teacher_studymodal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,7 +20,7 @@ class StudyChapters extends StatefulWidget {
 class _StudyChaptersState extends State<StudyChapters>
     with SingleTickerProviderStateMixin {
   var controller = Get.put(StudyController());
-  List<String> subjects = Get.arguments ?? [];
+  List<Subject> subjects = Get.arguments ?? [];
   final List<String> type = <String>['Notes', 'Assignment', 'Sample_Paper'];
   String mat = 'Notes';
   late TabController tabController;
@@ -60,7 +61,8 @@ class _StudyChaptersState extends State<StudyChapters>
             Get.toNamed('/addmaterial', arguments: {
               'type': mat,
               'class': controller.clas.value,
-              'subject': controller.subject.value
+              'classId':controller.classId.value,
+              'subject': controller.subjects
             });
           },
           label: Text('Upload'),
@@ -70,24 +72,28 @@ class _StudyChaptersState extends State<StudyChapters>
           actions: [
             PopupMenuButton(
               // onSelected: (String s) {
-              //   controller.subject(s);
+              //   controller.subjects(s);
               // },
               itemBuilder: (_) {
                 return subjects.map((e) {
                   return PopupMenuItem(
                     onTap: () {
-                      controller.subject(e);
+                      setState(() {
+                        controller.name(e.name);
+                        controller.classId(e.classId);
+                      });
+                      
                     },
-                    value: e,
+                    value: e.name,
                     child:
-                        Text(e, style: Theme.of(context).textTheme.headline4),
+                        Text('${e.name} Batch${e.batch}', style: Theme.of(context).textTheme.headline4),
                   );
                 }).toList();
               },
             )
           ],
           title: Text(
-            controller.subject.value,
+            controller.name.value,
             style: TextStyle(color: Colors.white),
           ),
         ),

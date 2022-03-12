@@ -1,9 +1,12 @@
 // ignore_for_file: prefer_const_constructors, curly_braces_in_flow_control_structures, unrelated_type_equality_checks, avoid_print
 
+import 'package:edeazy_teacher/modals/teacher_studymodal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:edeazy_teacher/controller/teach_event_controller.dart';
+
+// import '../controller/teacher_study_material_controller.dart';
 
 class AddEvent extends StatefulWidget {
   const AddEvent({Key? key}) : super(key: key);
@@ -15,6 +18,7 @@ class AddEvent extends StatefulWidget {
 class _AddEventState extends State<AddEvent> {
   //  Event? even;
   final controll = Get.put(EventController());
+  // final g = Get.put(StudyController());
 
   final titlecontroller = TextEditingController();
   final discriptioncontroller = TextEditingController();
@@ -23,9 +27,16 @@ class _AddEventState extends State<AddEvent> {
   TimeOfDay selectedTime2 = TimeOfDay.now();
   final formkey = GlobalKey<FormState>();
   late DateTime toDate = DateTime.now();
-  late List<String?> filter;
-  final List<bool> isSelect = List.filled(4, false);
-  final List<String> clas = <String>['9th', '10th', '11th', '12th'];
+  late List<String?> lectureId;
+  late List<bool> isSelect;
+  late List<bool> isbatch;
+  List<Subject>subjects = [];
+  @override
+  void initState() {
+    isSelect = List.filled(controll.classlist.length, false);
+    isbatch  = List.filled(subjects.length, false);
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -71,10 +82,11 @@ class _AddEventState extends State<AddEvent> {
               padding: const EdgeInsets.all(6),
               child: ListView.builder(
                 itemBuilder: (context, item) {
+                  // clas.add(g.classlist[item].subjects[item].batch);
                   return Padding(
                     padding: const EdgeInsets.only(left: 5.0, right: 5),
                     child: FilterChip(
-                      selected: isSelect[item],
+                      selected:isSelect[item],
                       checkmarkColor: Colors.white,
                       selectedColor: Colors.greenAccent,
                       labelStyle: TextStyle(
@@ -85,25 +97,67 @@ class _AddEventState extends State<AddEvent> {
                             Theme.of(context).textTheme.headline3!.fontWeight,
                       ),
                       label: Text(
-                        clas[item],
+                        '${controll.classlist[item].teacherClass}th ${controll.classlist[item].stream}',
                       ),
                       onSelected: (value) {
                         setState(() {
                           isSelect[item] = value;
-                          // if(value)
-                          // filter.add(clas[item].replaceAll('th', ''));
-                          // else filter.removeWhere((String h){
-                          //   return h == clas[item];
-                          // });
+                          subjects.addAllIf(value, controll.classlist[item].subjects);
+                          if(!value){
+                            subjects = List.from(subjects.toSet().difference(controll.classlist[item].subjects.toSet()));
+                          }
+                          isbatch = List.filled(subjects.length, false);
                         });
                       },
                     ),
                   );
                 },
-                itemCount: clas.length,
+                itemCount: controll.classlist.length,
                 scrollDirection: Axis.horizontal,
               ),
             ),
+             SizedBox(height: 20),
+            Text(
+              'Choose Batch',
+              style: Theme.of(context).textTheme.headline3,
+            ),
+            (subjects.isNotEmpty)?
+            Container(
+              height: 50,
+              padding: const EdgeInsets.all(6),
+              child: ListView.builder(
+                itemBuilder: (context, item) {
+                  
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 5.0, right: 5),
+                    child: FilterChip(
+                      selected:isbatch[item],
+                      checkmarkColor: Colors.white,
+                      selectedColor: Colors.greenAccent,
+                      labelStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize:
+                            Theme.of(context).textTheme.headline3!.fontSize,
+                        fontWeight:
+                            Theme.of(context).textTheme.headline3!.fontWeight,
+                      ),
+                      label: Text(
+                        'Batch ${subjects[item].batch} ${subjects[item].name}',
+                      ),
+                      onSelected: (value) {
+                        setState(() {
+                          isbatch[item] = value;
+                          if(value)
+                          lectureId = [subjects[item].lectureId];
+                        });
+                      },
+                    ),
+                  );
+                },
+                itemCount: subjects.length,
+                scrollDirection: Axis.horizontal,
+              ),
+            ) : Container(),
             SizedBox(height: 20),
             Text(
               'Choose Start Date and Time',
@@ -180,7 +234,7 @@ class _AddEventState extends State<AddEvent> {
             TextFormField(
               minLines: 1,
               maxLines: 5,
-              maxLength: 300,
+              maxLength: 200,
               style: TextStyle(fontSize: 14),
               decoration: InputDecoration(
                 fillColor: Colors.grey[200],
@@ -210,19 +264,18 @@ class _AddEventState extends State<AddEvent> {
                       fromDate.day, selectedTime.hour, selectedTime.minute);
                   final dt1 = DateTime(toDate.year, toDate.month, toDate.day,
                       selectedTime2.hour, selectedTime2.minute);
+                      print(dt);
                   setState(() {
-                    filter = isSelect.asMap().entries.map((e) {
-                      if (e.value) return clas[e.key].replaceAll('th', '');
-                    }).toList();
-                    filter.removeWhere((element) => element == null);
+                    // filter = isSelect.asMap().entries.map((e) {
+                    //   if (e.value) return clas[e.key].replaceAll('th', '');
+                    // }).toList();
+                    // filter.removeWhere((element) => element == null);
                   });
                   controll.postEventdata(
-                      classes: filter,
+                      classes: lectureId,
                       description: discriptioncontroller.text,
-                      startDatefromEpoch: fromDate.millisecondsSinceEpoch,
-                      endDatefromEpoch: toDate.millisecondsSinceEpoch,
-                      startTime: dt.millisecondsSinceEpoch,
-                      endTime: dt1.millisecondsSinceEpoch,
+                      start: dt,
+                      end: dt1,
                       title: titlecontroller.text);
                 }
               },

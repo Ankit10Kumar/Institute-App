@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:edeazy_teacher/controller/teach_add_material_controller.dart';
 import 'package:edeazy_teacher/modals/teacher_studymodal.dart';
 import 'package:edeazy_teacher/screens/study_material/pdf_preview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AddMaterial extends StatefulWidget {
   const AddMaterial({Key? key}) : super(key: key);
@@ -18,13 +19,13 @@ class _AddMaterialState extends State<AddMaterial> {
   final chaptercontroller = TextEditingController();
   final discriptioncontroller = TextEditingController();
   final chapterNoController = TextEditingController();
+  final linkController = TextEditingController();
   final formkey = GlobalKey<FormState>();
   bool s = false;
 
   @override
   void initState() {
-    cont.clas(data['class']);
-    cont.subject(data['subject']);
+    cont.classId(data['classId']);
     cont.type(data['type']);
     super.initState();
   }
@@ -38,7 +39,6 @@ class _AddMaterialState extends State<AddMaterial> {
 
   @override
   Widget build(BuildContext context) {
-    // Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -124,6 +124,34 @@ class _AddMaterialState extends State<AddMaterial> {
               onFieldSubmitted: (_) {},
               controller: discriptioncontroller,
             ),
+            const SizedBox(height: 10),
+            if(cont.type.value == "Notes")
+                  TextFormField(
+                    autofocus: false,
+                    maxLength: 50,
+                    maxLines: null,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline2!
+                        .copyWith(color: Colors.black54),
+                    decoration: InputDecoration(
+                      fillColor: Colors.grey[200],
+                      filled: true,
+                      hintText: 'Paste your Youtube Link Here',
+                      hintStyle: const TextStyle(color: Colors.black45),
+                      border: const OutlineInputBorder(),
+                    ),
+                    onTap: () async {
+                      if(await canLaunch('https://us05web.zoom.us/j/88357630580?pwd=S2QyZFFVR0dqN3RpcVg1TlhiTlVQUT09')){
+                        await launch('https://us05web.zoom.us/j/88357630580?pwd=S2QyZFFVR0dqN3RpcVg1TlhiTlVQUT09',
+                                    forceSafariVC:false,
+                                    forceWebView: true,
+                                    enableJavaScript: true
+                        );
+                      }
+                    },
+                    controller: linkController,
+                  ),
             const SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -182,30 +210,34 @@ class _AddMaterialState extends State<AddMaterial> {
                       ),
                     );
                   }
-                  return TextButton.icon(
-                    style: TextButton.styleFrom(
-                      minimumSize: const Size(150, 50),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      backgroundColor: Colors.blue,
-                      primary: Colors.white,
-                    ),
-                    onPressed: () async {
-                      final result = await FilePicker.platform.pickFiles();
-                      if (result == null) {
-                        return;
-                      } else if (result.files.first.path == null) {
-                        return;
-                      }
-                      final file = result.files.first;
-                      cont.postFile(
-                        name: file.name,
-                        path: file.path ?? '',
-                      );
-                    },
-                    icon: const Icon(Icons.upload_rounded),
-                    label: const Text('Choose File'),
+                  return Column(
+                    children: [
+                      TextButton.icon(
+                        style: TextButton.styleFrom(
+                          minimumSize: const Size(150, 50),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          backgroundColor: Colors.blue,
+                          primary: Colors.white,
+                        ),
+                        onPressed: () async {
+                          final result = await FilePicker.platform.pickFiles();
+                          if (result == null) {
+                            return;
+                          } else if (result.files.first.path == null) {
+                            return;
+                          }
+                          final file = result.files.first;
+                          cont.postFile(
+                            name: file.name,
+                            path: file.path ?? '',
+                          );
+                        },
+                        icon: const Icon(Icons.upload_rounded),
+                        label: const Text('Choose File'),
+                      ),
+                    ],
                   );
                 }),
               ],
@@ -233,6 +265,7 @@ class _AddMaterialState extends State<AddMaterial> {
                                 chapname: chaptercontroller.text,
                                 chapno: chapterNoController.text,
                                 topic: discriptioncontroller.text,
+                                link:linkController.text,
                               );
                             } else if (cont.type.value == 'Assignment' ||
                                 cont.type.value == 'Sample Paper') {

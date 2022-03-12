@@ -11,7 +11,7 @@ class LoginServices {
   static var baseURL = 'https://pure-crag-69424.herokuapp.com/api';
 
   static Future<UserData> login({
-    required String num,
+    required String userName,
     required String password,
   }) async {
     try {
@@ -23,13 +23,16 @@ class LoginServices {
               // "Access-Control-Allow-Origin": "*",
             },
             body: jsonEncode({
-              "phoneNumber": num,
+              "userName": userName,
               "password": password,
               "appRole": "Teacher"
             }),
           )
           .timeout(const Duration(seconds: 60));
       var data = jsonDecode(response.body);
+      // if(data['isAccountVerified'] ?? true){
+      //   throw "Account is not Verified";
+      // }
       if (data['success']) {
         return UserData.fromJson(data['data']);
       }
