@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 /// You can set [repeat] to true for making a paulsing effect.
 class LiveAnimation extends StatefulWidget {
   final Widget child;
-  final Duration delay;
+  // final Duration delay;
   final double minRadius;
   final Color? color;
   final int ripplesCount;
@@ -19,7 +19,6 @@ class LiveAnimation extends StatefulWidget {
     Key? key,
     required this.child,
     this.color,
-    this.delay = const Duration(milliseconds: 0),
     this.repeat = false,
     this.animate = false,
     this.minRadius = 60,
@@ -43,9 +42,8 @@ class _LiveAnimationState extends State<LiveAnimation>
     );
 
     // repeating or just forwarding the animation once.
-    Timer(widget.delay, () {
-      widget.repeat ? _controller.repeat() : _controller.forward();
-    });
+
+    widget.repeat ? _controller.repeat() : _controller.forward();
 
     super.initState();
   }

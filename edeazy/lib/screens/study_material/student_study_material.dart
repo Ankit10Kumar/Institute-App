@@ -1,3 +1,4 @@
+import 'package:edeazy/models/study_modals.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edeazy/controller/study_material_controller.dart';
@@ -14,14 +15,14 @@ class SubjectMaterial extends StatefulWidget {
 
 class _SubjectMaterialState extends State<SubjectMaterial> {
   var cont = Get.put(StudyController());
-
   @override
   Widget build(BuildContext context) {
+    final ScreenArguments? args = Get.arguments as ScreenArguments?;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(cont.subject.value),
+          title: Text((args == null) ? 'Subjects' : args.title ?? 'Subject'),
         ),
         body: Column(
           children: [
@@ -60,7 +61,7 @@ class _SubjectMaterialState extends State<SubjectMaterial> {
             Expanded(
               child: TabBarView(
                 children: [
-                  StudentNotes(),
+                  const StudentNotes(),
                   SecondaryMaterial(mat: 'Assignment'),
                   SecondaryMaterial(mat: 'Sample_Paper'),
                 ],

@@ -15,12 +15,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   int _myindex = 0;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -42,11 +38,9 @@ class _HomePageState extends State<HomePage> {
                 _myindex = i;
               });
             }),
-        body: BottomBarPageTransition(
-          // transitionType: TransitionType.slide,
-          builder: (_, i) => mylist.elementAt(i),
-          currentIndex: _myindex,
-          totalLength: mylist.length,
+        body: IndexedStack(
+          children: mylist,
+          index: _myindex,
         ),
       ),
     );
@@ -58,3 +52,10 @@ final mylist = <Widget>[
   Calender(),
   StudyMaterial(),
 ];
+
+// BottomBarPageTransition(
+//             // transitionType: TransitionType.slide,
+//             builder: (_, i) => mylist.elementAt(i),
+//             currentIndex: _myindex,
+//             totalLength: mylist.length,
+//           ),

@@ -16,6 +16,7 @@ import 'screens/drawer/performance.dart';
 import 'screens/study_material/student_study_material.dart';
 
 void main() async {
+  await GetStorage.init();
   runApp(const MyApp());
 }
 
@@ -168,7 +169,6 @@ class Init {
   Init._();
   static final instance = Init._();
   Future<bool> initialize() async {
-    await GetStorage.init();
     var c = Get.put(AuthrisationController());
     final g = GetStorage();
     String d = g.read('token') ?? '';

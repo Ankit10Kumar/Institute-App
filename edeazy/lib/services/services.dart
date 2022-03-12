@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html';
 import 'dart:io';
+import 'package:edeazy/services/app_exception.dart';
 import 'package:http/http.dart' as http;
 import 'package:edeazy/models/eventModals.dart';
 import 'package:edeazy/models/study_modals.dart';
@@ -9,6 +9,29 @@ import 'package:edeazy/models/study_modals.dart';
 class Services {
   static var client = http.Client();
   static var baseURL = 'https://pure-crag-69424.herokuapp.com/api';
+
+  //check status and return response
+  static dynamic _processResponse(http.Response response) {
+    switch (response.statusCode) {
+      case 200:
+      case 201:
+        var data = json.decode(response.body);
+        return data['data'];
+      case 400:
+        throw BadRequestException(utf8.decode(response.bodyBytes));
+      case 401:
+      case 403:
+        throw UnAuthorizedException(utf8.decode(response.bodyBytes));
+      case 404:
+        throw ServiceNotFound();
+      case 422:
+        throw BadRequestException(utf8.decode(response.bodyBytes));
+      case 500:
+      default:
+        throw DefaultException(
+            'Error occured with code : ${response.statusCode}');
+    }
+  }
 
 // API for Fetching Events
 
@@ -59,27 +82,25 @@ class Services {
 
 // API for Fetching Notes of subjects
 
-  static Future<List<Notes>> fetchNotes(
-      {required String token,
-      required String clas,
-      required String subj}) async {
+  static Future<List<Notes>> fetchNotes({
+    required String token,
+    required String classId,
+  }) async {
     try {
       var res = await client.get(
-          Uri.parse("$baseURL/study/notes/$clas/$subj/chapters"),
+          Uri.parse(
+              "$baseURL/organisation/study-material/notes/$classId/chapters"),
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'Authorization': 'Bearer $token',
           }).timeout(const Duration(seconds: 30));
-      var data = jsonDecode(res.body);
-      if (data['success']) {
-        return notesfrom(data['data']);
-      }
-      throw data['error']['message'] ?? 'No data';
+      dynamic data = _processResponse(res);
+      return notesfrom(data);
     } on TimeoutException {
-      throw 'Api Not Responding';
+      throw ApiNotRespondingException('API not responded in time');
     } on SocketException {
-      throw 'Can\'t Connect to API';
+      throw FetchDataException('No Internet connection');
     }
   }
 
@@ -111,27 +132,25 @@ class Services {
 // API for Fetching Assignments/Sample_Papers
   static Future<List<SecondaryMatModal>> fetchwork({
     required String token,
-    required String clas,
-    required String subj,
+    required String classId,
     required String smat,
   }) async {
     try {
       var res = await client.get(
-          Uri.parse("$baseURL/study/secondary-material/$clas/$subj?type=$smat"),
+          Uri.parse(
+              "$baseURL/organisation/study-material/secondary-material/$classId?type=$smat"),
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'Authorization': 'Bearer $token',
-          }).timeout(const Duration(seconds: 30));
-      var data = jsonDecode(res.body);
-      if (data['success']) {
-        return secmatfrom(data['data']);
-      }
-      throw data['error']['message'] ?? 'No data';
+          }).timeout(const Duration(seconds: 10));
+      print(res.statusCode);
+      dynamic data = _processResponse(res);
+      return secmatfrom(data);
     } on TimeoutException {
-      throw 'Api Not Responding';
+      throw ApiNotRespondingException('API not responded in time');
     } on SocketException {
-      throw 'Can\'t Connect to API';
+      throw FetchDataException('No Internet connection');
     }
   }
 

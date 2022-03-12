@@ -23,6 +23,7 @@ class Calender extends StatefulWidget {
 }
 
 class _CalenderState extends State<Calender> {
+  late ScrollController scrollController;
   EventController control = Get.put(EventController());
   CalendarFormat format = CalendarFormat.month;
   DateTime focusday = DateTime.now();
@@ -31,9 +32,16 @@ class _CalenderState extends State<Calender> {
 
   @override
   void initState() {
+    scrollController = ScrollController();
     events = <Events>[];
     selecteday = DateTime.now();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,6 +60,7 @@ class _CalenderState extends State<Calender> {
         }
         events = getListofEvent(selecteday);
         return CustomScrollView(
+          controller: scrollController,
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
@@ -271,109 +280,6 @@ class _CalenderState extends State<Calender> {
                         ),
                       ],
                     ),
-                    // child: ExpansionPanelList(
-                    //   dividerColor: Colors.red,
-                    //   expandedHeaderPadding: EdgeInsets.only(bottom: 3, top: 3),
-                    //   animationDuration: Duration(milliseconds: 450),
-                    //   expansionCallback: (i, exp) {
-                    //     setState(() {
-                    //       events[item].isExpanded = !exp;
-                    //     });
-                    //   },
-                    //   children: [
-                    //     ExpansionPanel(
-                    //       backgroundColor: cardcolor,
-                    //       canTapOnHeader: true,
-                    //       isExpanded: events[item].isExpanded,
-                    //       headerBuilder: (context, isex) {
-                    //         return Row(
-                    //           mainAxisSize: MainAxisSize.min,
-                    //           mainAxisAlignment: MainAxisAlignment.start,
-                    //           children: [
-                    //             Container(
-                    //               margin: EdgeInsets.symmetric(horizontal: 20),
-                    //               child: Text(
-                    //                 DateFormat('MMM d').format(selecteday),
-                    //                 style: TextStyle(
-                    //                     fontSize: 25, color: bodycolor),
-                    //               ),
-                    //             ),
-                    //             Column(
-                    //               mainAxisAlignment: MainAxisAlignment.start,
-                    //               crossAxisAlignment: CrossAxisAlignment.start,
-                    //               children: [
-                    //                 Padding(
-                    //                   padding: const EdgeInsets.only(
-                    //                       top: 8.0, bottom: 15, right: 5),
-                    //                   child: Text(
-                    //                     events[item].name ?? 'Event',
-                    //                     style: TextStyle(
-                    //                       fontSize: Theme.of(context)
-                    //                           .textTheme
-                    //                           .headline2!
-                    //                           .fontSize,
-                    //                       fontWeight: Theme.of(context)
-                    //                           .textTheme
-                    //                           .headline2!
-                    //                           .fontWeight,
-                    //                       color: bodycolor,
-                    //                     ),
-                    //                   ),
-                    //                 ),
-                    //                 Text(
-                    //                   'Anonymus',
-                    //                   style: TextStyle(
-                    //                     fontSize: Theme.of(context)
-                    //                         .textTheme
-                    //                         .headline4!
-                    //                         .fontSize,
-                    //                     fontWeight: Theme.of(context)
-                    //                         .textTheme
-                    //                         .headline4!
-                    //                         .fontWeight,
-                    //                     color: bodycolor,
-                    //                   ),
-                    //                 ),
-                    //                 SizedBox(height: 8),
-                    //               ],
-                    //             ),
-                    //           ],
-                    //         );
-                    //       },
-                    //       body: Container(
-                    //         padding: EdgeInsets.all(10),
-                    //         color: Colors.white,
-                    //         child: Column(
-                    //           children: [
-                    //             Row(
-                    //               mainAxisAlignment:
-                    //                   MainAxisAlignment.spaceAround,
-                    //               children: [
-                    //                 Text(
-                    //                   DateFormat('EEE, MMM d hh:mm a')
-                    //                       .format(events[item].startTime),
-                    //                   style:
-                    //                       Theme.of(context).textTheme.headline3,
-                    //                 ),
-                    //                 Text(
-                    //                   DateFormat('EEE, MMM d hh:mm a')
-                    //                       .format(events[item].endTime),
-                    //                   style:
-                    //                       Theme.of(context).textTheme.headline3,
-                    //                 ),
-                    //               ],
-                    //             ),
-                    //             SizedBox(height: 10),
-                    //             Text(
-                    //               events[item].description ?? '',
-                    //               style: Theme.of(context).textTheme.headline4,
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       ),
-                    //     )
-                    //   ],
-                    // ),
                   );
                 },
                 childCount: events.length,

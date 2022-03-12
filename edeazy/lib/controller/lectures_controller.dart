@@ -1,27 +1,28 @@
 import 'dart:async';
-import 'package:edeazy/services/services.dart';
+import 'dart:convert';
+import 'package:edeazy/models/lecture_modal.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as i_o;
 import 'package:get_storage/get_storage.dart';
 
-class Lecture extends GetxController {
-  var isLoading = true.obs;
-  var lectures = ''.obs;
+class Lecture {
   final storage = GetStorage();
   late i_o.Socket socket;
-  final _stateStreamController = StreamController<String>();
+  List<Lectures> liveLectures = <Lectures>[];
+  final _todayLectureStreamController = StreamController<List<Lectures>>();
+  final _liveLectureStreamController = StreamController<List<Lectures>>();
   // final _eventStreamController = StreamController<String>();
 
-  StreamSink<String> get _stateSink => _stateStreamController.sink;
-  Stream<String> get stateStream => _stateStreamController.stream;
+  StreamSink<List<Lectures>> get _todayLectureSink =>
+      _todayLectureStreamController.sink;
+  Stream<List<Lectures>> get todayLectureStream =>
+      _todayLectureStreamController.stream;
 
-  @override
-  void onInit() {
-    fetchLectures();
-    super.onInit();
-  }
+  StreamSink<List<Lectures>> get _liveLectureSink =>
+      _liveLectureStreamController.sink;
+  Stream<List<Lectures>> get liveLectureStream =>
+      _liveLectureStreamController.stream;
 
   void toast(
       {String title = 'Error', String message = 'Something Went Wrong'}) {
@@ -38,57 +39,64 @@ class Lecture extends GetxController {
   }
 
   Lecture() {
-    var payload = storage.read('id');
-    print('Connecting to Socket with token $payload');
+    debugPrint('in Lecture constructor');
+    var payload = storage.read('token');
     socket = i_o.io(
       'http://192.168.1.25:2331',
       {
         'transports': ['websocket'],
         'autoConnect': false,
+        'auth': {'token': payload},
       },
     );
     socket.connect();
     socket.onConnect((_) {
-      socket.emit('meeting:join-room', payload);
       debugPrint('connected to websocket with id $_');
-      _stateSink.add('data'.toString());
+    });
+    socket.on('today:lectures', (data) {
+      print(data);
+      var lectures = <Lectures>[];
+      if (data != null) {
+        lectures = lecturesFromJson(json.decode(data));
+        liveLectures = [
+          ...liveLectures,
+          ...lectures.where((element) => element.isLive)
+        ];
+      }
+      _todayLectureSink.add(lectures);
+      _liveLectureSink.add(liveLectures);
+    });
+    socket.on('meeting:started', (data) {
+      print(data);
+      var lecture = Lectures.fromJson(json.decode(data)['lecture']);
+      liveLectures.add(lecture);
+      _liveLectureSink.add(liveLectures);
+    });
+    socket.on('meeting:ended', (id) {
+      liveLectures.removeWhere((item) => item.id == id);
+      _liveLectureSink.add(liveLectures);
+    });
+    socket.on('handler:error', (error) {
+      _todayLectureSink.addError(error['message']);
     });
     socket.onConnectError((err) {
       debugPrint('error ++> $err');
-      _stateSink.addError('Connection Error');
+      _todayLectureSink.addError('Connection Error');
     });
-    socket.on('handler:error', (err) {
-      debugPrint('in no token ${err.toString()}');
-      _stateSink.addError(err.toString());
-    });
-    socket.on('room:msg', (data) {
-      debugPrint('in success ${data.toString()}');
-      _stateSink.add(data.toString());
+    socket.onError((err) {
+      debugPrint('onError ++> $err');
+      _todayLectureSink.addError(err['message']);
     });
     socket.onConnectTimeout((err) {
       debugPrint('data ==> $err');
-      _stateSink.addError(err.toString());
+      _todayLectureSink.addError('Connection TimeOut, Please Retry');
     });
   }
 
-  void fetchLectures() async {
-    try {
-      isLoading(true);
-      var data =
-          await Services.fetchLectures(token: storage.read('token') ?? '');
-      lectures(data);
-      isLoading(false);
-    } catch (e) {
-      isLoading(false);
-      toast(message: e.toString());
-    }
-    isLoading(false);
-  }
-
-  @override
   void dispose() {
-    _stateStreamController.close();
+    liveLectures = [];
+    debugPrint('In Lecture Dispose');
+    _todayLectureStreamController.close();
     socket.dispose();
-    super.dispose();
   }
 }

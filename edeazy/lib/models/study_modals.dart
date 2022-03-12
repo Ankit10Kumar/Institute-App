@@ -5,14 +5,14 @@ List<Map<String, dynamic>> subjtojson(List<SubjData> subj) =>
     subj.map((e) => e.toJson()).toList();
 
 class SubjData {
-  String? classId;
-  int? batch;
-  String? subject;
+  String classId;
+  int batch;
+  String subject;
   String? teacher;
   SubjData({
-    this.classId,
-    this.batch,
-    this.subject,
+    required this.classId,
+    required this.batch,
+    required this.subject,
     this.teacher,
   });
 
@@ -147,4 +147,11 @@ class FileClass {
         "name": name,
         "url": url,
       };
+}
+
+class ScreenArguments {
+  final String? title;
+  final String? id;
+
+  ScreenArguments({this.title, this.id});
 }

@@ -41,12 +41,10 @@ class EventController extends GetxController {
         from: fromDate.millisecondsSinceEpoch,
         to: toDate.millisecondsSinceEpoch,
       );
-      print(data);
       eventList(data);
       isLoading(false);
     } catch (e) {
       isLoading(false);
-      toast(message: e.toString());
     }
     isLoading(false);
   }

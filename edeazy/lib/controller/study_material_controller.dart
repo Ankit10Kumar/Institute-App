@@ -8,13 +8,11 @@ import '../services/services.dart';
 class StudyController extends GetxController {
   var g = GetStorage();
   var token = ''.obs;
-  var clas = ''.obs;
-  var subject = ''.obs;
+  var classId = ''.obs;
   var chapterId = ''.obs;
   @override
   void onInit() {
     token(g.read('token') ?? '');
-    clas(g.read('class') ?? '');
     subjects();
     super.onInit();
   }
@@ -54,7 +52,6 @@ class StudyController extends GetxController {
       loadingSubj(false);
     } catch (e) {
       loadingSubj(false);
-      toast(message: e.toString());
     }
   }
 
@@ -65,8 +62,8 @@ class StudyController extends GetxController {
   void fetchNotes() async {
     loadingNote(true);
     try {
-      var n = await Services.fetchNotes(
-          token: token.value, subj: subject.value, clas: clas.value);
+      var n =
+          await Services.fetchNotes(token: token.value, classId: classId.value);
       notes = n;
       loadingNote(false);
       update();
@@ -87,10 +84,10 @@ class StudyController extends GetxController {
     (smat == 'Assignment') ? loadingAss(true) : loadingSample(true);
     try {
       var n = await Services.fetchwork(
-          token: token.value,
-          clas: clas.value,
-          subj: subject.value,
-          smat: smat);
+        token: token.value,
+        classId: classId.value,
+        smat: smat,
+      );
       if (smat == 'Assignment') {
         assignment = n;
         loadingAss(false);
