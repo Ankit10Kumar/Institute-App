@@ -64,57 +64,45 @@ class PostEvents {
 
   PostEvents({
     required this.classes,
-    this.startDate,
+    this.start,
     this.name,
     this.discription,
-    this.endDate,
-    this.startTime,
-    this.endTime,
+    this.end,
   });
   final List<String?> classes;
-  final int? startDate;
+  final DateTime? start;
   final String? name;
   final String? discription;
-  final int? endDate;
-  final int? startTime;
-  final int? endTime;
+  final DateTime? end;
 
   PostEvents copyWith({
     required List<String?> classes,
-    int? startDate,
+    DateTime? start,
     String? name,
     String? discription,
-    int? endDate,
-    int? startTime,
-    int? endTime,
+    DateTime? end,
   }) =>
       PostEvents(
         classes: classes,
-        startDate: startDate??this.startDate,
+        start: start??this.start,
         name: name ?? this.name,
         discription: discription ?? this.discription,
-        endDate: endDate ?? this.endDate,
-        startTime: startTime ?? this.startTime,
-        endTime: endTime ?? this.endTime,
+        end: end ?? this.end,
       );
 
   factory PostEvents.fromJson(Map<String, dynamic> json) => PostEvents(
         name: json["name"],
         classes: json["classes"],
-        startDate: json["startDate"],
+        start: json["start"],
         discription: json["discription"],
-        endDate: json["endDate"],
-        startTime: json["startTime"],
-        endTime: json["endTime"],
+        end: json["end"],
       );
 
   Map<String, dynamic> toJson() => {
         "classes":classes,
         "name": name,
-        "startDate":startDate,
+        "start":start,
         "discription": discription,
-        "endDate": endDate,
-        "startTime": startTime,
-        "endTime": endTime,
+        "end": end,
       };
 }

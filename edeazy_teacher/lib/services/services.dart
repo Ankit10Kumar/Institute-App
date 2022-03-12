@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
+import 'package:edeazy_teacher/modals/jitsii_modal.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime_type/mime_type.dart';
@@ -24,22 +25,18 @@ class Services {
       required String description,
       required String token,
       required List<String?> classes,
-      required int startDatefromEpoch,
-      required int endDatefromEpoch,
-      required int startTime,
-      required int endTime}) async {
+      required DateTime start,
+      required DateTime end}) async {
     try {
       final bod = jsonEncode({
         "name": title,
         "class": classes,
-        "startDateEpoch": startDatefromEpoch,
-        "startTime": startTime,
-        "endDateEpoch": endDatefromEpoch,
-        "endTime": endTime,
+        "start": start.toIso8601String(),
+        "end": end.toIso8601String(),
         "description": description,
       });
 
-      var response = await http.post(Uri.parse('$baseURL/events'),
+      var response = await http.post(Uri.parse('$baseURL/organisation/events'),
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
@@ -88,7 +85,7 @@ class Services {
       {required String token}) async {
     try {
       var response = await http.get(
-        Uri.parse('$baseURL/users/teacher-subjects'),
+        Uri.parse('$baseURL/organisation/lectures/user-subjects'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -97,6 +94,7 @@ class Services {
       );
       final resString = jsonDecode(response.body);
       if (resString['success'] ?? false) {
+        print(resString['data']);
         return teacherclasfrom(resString['data']);
       }
       throw resString['error']['message'] ?? 'No Data';
@@ -112,8 +110,8 @@ class Services {
   static Future<void> postNotesMaterialtdata({
     required String fileid,
     required String token,
-    required String clas,
-    required String subject,
+    required String classId,
+    String? link,
     String? chapno,
     String? chapname,
     required String topic,
@@ -121,12 +119,12 @@ class Services {
     try {
       final bod = jsonEncode({
         "chapterNumber": chapno,
-        "class": clas,
-        "subject": subject,
+        "classId": classId,
         "chapterName": chapname,
         "topic": {
           "name": topic,
           "file": fileid,
+          "youtubeLink":link,
         }
       });
 
@@ -153,11 +151,10 @@ class Services {
 
   static Future<List<Notes>> fetchNotes(
       {required String token,
-      required String clas,
-      required String subj}) async {
+      required String classId,}) async {
     try {
       var res = await client.get(
-          Uri.parse("$baseURL/study/notes/$clas/$subj/chapters"),
+          Uri.parse("$baseURL/study/notes/$classId/chapters"),
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
@@ -179,8 +176,7 @@ class Services {
 
   static Future<void> postAssampletMaterialtdata({
     required String filetype,
-    required String clas,
-    required String subject,
+    required String classId,
     required String fileid,
     required String token,
     required String topicname,
@@ -190,12 +186,11 @@ class Services {
         "type": filetype,
         "file": fileid,
         "name": topicname,
-        "class": clas,
-        "subject": subject,
+        "classId": classId,
       });
 
       var response =
-          await http.post(Uri.parse('$baseURL/study/secondary-material'),
+          await http.post(Uri.parse('$baseURL/study/secondary-material/$classId?type=$filetype'),
               headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -218,13 +213,12 @@ class Services {
 
   static Future<List<SecondaryMatModal>> fetchWork({
     required String token,
-    required String clas,
-    required String subj,
+    required String classId,
     required String smat,
   }) async {
     try {
       var res = await client.get(
-          Uri.parse("$baseURL/study/secondary-material/$clas/$subj?type=$smat"),
+          Uri.parse("$baseURL/study/secondary-material/$classId/?type=$smat"),
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
@@ -333,4 +327,28 @@ class Services {
       throw 'Can\'t connect to API';
     }
   }
+ // for jitsii classes
+ 
+  static Future<List<Jitsii>> fetchClass(
+      {required String token}) async { 
+    try {
+      var response = await http.get(
+        Uri.parse('$baseURL/users/upcoming-lectures'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      final resString = jsonDecode(response.body);
+      if (resString['success'] ?? false) {
+        return jitsiiclassfrom(resString['data']);
+      }
+      throw resString['error']['message'] ?? 'No Data';
+    } on TimeoutException {
+      throw 'API not Responding';
+    } on SocketException {
+      throw 'Can\'t connect to API';
+    }
+  } 
 }

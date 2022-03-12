@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 // import 'package:imstitute/colorScheme.dart';
+// import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../coustom/customeWidgets.dart';
 import 'drawer/custome_drawer.dart';
@@ -11,7 +12,6 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Size size = MediaQuery.of(context).size;
     return Scaffold(
       drawer: CustomeDrawer(),
       appBar: AppBar(
@@ -45,7 +45,10 @@ class Home extends StatelessWidget {
                   ),
                   MyCard(
                     canjoin: true,
-                  ),
+                    name: "Harry",
+                    subject: "Physics",
+                    timing: "1AM - 2AM",
+                  ), 
                   Padding(
                     padding: const EdgeInsets.only(top: 20.0, bottom: 10),
                     child: Text(
@@ -62,6 +65,9 @@ class Home extends StatelessWidget {
               (context, item) {
                 return MyCard(
                   canjoin: false,
+                    name: "Harry",
+                    subject: "Physics",
+                    timing: "1AM - 2AM",
                 );
               },
               childCount: 3,

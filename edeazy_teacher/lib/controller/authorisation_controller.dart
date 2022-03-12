@@ -44,10 +44,10 @@ class AuthrisationController extends GetxController {
     );
   }
 
-  Future<void> login({required String number, required String password}) async {
+  Future<void> login({required String username, required String password}) async {
     try {
       dialog();
-      var data = await LoginServices.login(num: number, password: password);
+      var data = await LoginServices.login(userName: username, password: password);
       refreshUser(data: data);
       // Get.back();
       url(data.url);
@@ -136,11 +136,11 @@ class AuthrisationController extends GetxController {
     g.write('url', data.url);
     g.write('email', data.email);
     g.write('phone', data.phoneNumber.toString());
-    // g.write('class', data.clas);
+    g.write('organisationId', data.organisationId);
     g.write('address', data.address);
     g.write('id', data.id);
     g.write('gender', data.gender);
-    // g.write('subjects', data.subjects);
+    g.write('lectures', data.lectures);
   }
 
   String userinfo({required String key}) {

@@ -102,7 +102,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  var usercontroll = TextEditingController(text: '1234567899');
+  var usercontroll = TextEditingController(text: 'kzxv8lop');
   var passcontroll = TextEditingController(text: 'password');
   var formKey = GlobalKey<FormState>();
   bool isvisible = false;
@@ -184,16 +184,16 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                     FadeAnimation(
                       1.2,
                       component1(
-                        label: 'Phone Number',
+                        label: 'UserName',
                         child: TextFormField(
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "* Required";
-                            } else if (value.length < 10) {
-                              return 'Enter Valid Phone Number';
-                            } else if (!GetUtils.isNumericOnly(value)) {
-                              return 'Invalid Number';
-                            } else {
+                            // } else if (value.length < 10) {
+                            //   return 'Enter Valid Phone Number';
+                            // } else if (!GetUtils.isNumericOnly(value)) {
+                            //   return 'Invalid Number';
+                             } else {
                               return null;
                             }
                           },
@@ -210,7 +210,6 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                             fontFamily: 'OpenSans',
                           ),
                           cursorColor: Colors.white,
-                          keyboardType: TextInputType.phone,
                           decoration: const InputDecoration(
                             counterText: '',
                             hoverColor: Colors.transparent,
@@ -226,7 +225,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                             ),
                             border: InputBorder.none,
                             hintMaxLines: 1,
-                            hintText: 'Enter Your Phone Number',
+                            hintText: 'Enter Your UserName',
                             hintStyle: TextStyle(
                               fontSize: 15,
                               color: Colors.white54,
@@ -326,7 +325,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                             voidCallback: () async {
                               if (formKey.currentState!.validate()) {
                                 await logincontroll.login(
-                                    number: usercontroll.text,
+                                    username: usercontroll.text,
                                     password: passcontroll.text);
                               } else {
                                 Get.snackbar(

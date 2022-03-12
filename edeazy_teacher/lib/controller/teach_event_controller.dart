@@ -4,11 +4,14 @@ import 'package:get_storage/get_storage.dart';
 import 'package:edeazy_teacher/modals/teacher_eventmodal.dart';
 import 'package:edeazy_teacher/services/services.dart';
 
+import '../modals/teacher_studymodal.dart';
+
 class EventController extends GetxController {
   var g = GetStorage();
   @override
   void onInit() {
     fetchEvent();
+    classBatch();
     super.onInit();
   }
 
@@ -47,14 +50,25 @@ class EventController extends GetxController {
     isLoading(false);
   }
 
+  var classlist = <Teacher>[].obs;
+  var loadingClass = true.obs;
+  void classBatch() async{
+    try {
+      var s = await Services.fetchclassmaterial(token: g.read('token') ?? '');
+      classlist(s);
+      loadingClass(false);
+    } catch (e) {
+      loadingClass(false);
+      toast(message: e.toString());
+    }
+  }
+
   Future<void> postEventdata(
       {required String title,
       required String description,
       required List<String?> classes,
-      required int startDatefromEpoch,
-      required int endDatefromEpoch,
-      required int startTime,
-      required int endTime}) async {
+      required DateTime start,
+      required DateTime end}) async {
     try {
       isLoading(true);
       var token = g.read('token') ?? '';
@@ -62,10 +76,8 @@ class EventController extends GetxController {
           title: title,
           description: description,
           classes: classes,
-          startDatefromEpoch: startDatefromEpoch,
-          endDatefromEpoch: endDatefromEpoch,
-          startTime: startTime,
-          endTime: endTime,
+          start: start,
+          end: end,
           token: token);
 
       fetchEvent();

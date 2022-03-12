@@ -1,37 +1,139 @@
-//Modals for Techer Classes and Subjetcs
+// //Modals for Techer Classes and Subjetcs
 List<Teacher> teacherclasfrom(json) =>
     List.from(json).map((e) => Teacher.fromJson(e)).toList();
 List<Map<String, dynamic>> teacherclasto(List<Teacher> c) =>
     c.map((e) => e.toJson()).toList();
 
+List<Subject> subjectfrom(json) =>
+    List.from(json).map((e) => Subject.fromJson(e)).toList();
+List<Map<String, dynamic>> subjectto(List<Subject> c) =>
+    c.map((e) => e.toJson()).toList();
+
+// class Teacher {
+//   Teacher({
+//     required this.teacherClass,
+//     required this.stream,
+//     required this.subject,
+    
+//   });
+
+//   final String teacherClass;
+//   final String stream;
+//   final List<String> subject;
+
+//   Teacher copyWith({
+//     String? teacherClass,
+//     String? stream,
+//     List<String>? subject,
+//   }) =>
+//       Teacher(
+//         teacherClass: teacherClass ?? this.teacherClass,
+//         subject: subject ?? this.subject,
+//         stream: stream ?? this.stream,
+//       );
+
+//   factory Teacher.fromJson(Map<String, dynamic> json) => Teacher(
+//         teacherClass: json["class"],
+//         stream: json['stream'],
+//         subject: List<String>.from(json["subjects"].map((x) => x)),
+//       );
+
+//   Map<String, dynamic> toJson() => {
+//         "class": teacherClass,
+//         "stream": stream,
+//         "subjects": List<dynamic>.from(subject.map((x) => x)),
+//       };
+// }
+
+// To parse this JSON data, do
+//
+//     final teacher = teacherFromJson(jsonString);
+
+
 class Teacher {
-  Teacher({
-    required this.teacherClass,
-    required this.subject,
-  });
+    Teacher({
+        required this.teacherClass,
+        required this.stream,
+        required this.subjects,
+    });
 
-  final String teacherClass;
-  final List<String> subject;
+    final String teacherClass;
+    final String stream;
+    final List<Subject> subjects;
 
-  Teacher copyWith({
-    String? teacherClass,
-    List<String>? subject,
-  }) =>
-      Teacher(
-        teacherClass: teacherClass ?? this.teacherClass,
-        subject: subject ?? this.subject,
-      );
+    Teacher copyWith({
+        String? teacherClass,
+        String? stream,
+        List<Subject>? subjects,
+    }) => 
+        Teacher(
+            teacherClass: teacherClass ?? this.teacherClass,
+            stream: stream ?? this.stream,
+            subjects: subjects ?? this.subjects,
+        );
 
-  factory Teacher.fromJson(Map<String, dynamic> json) => Teacher(
+    // factory Teacher.fromRawJson(String str) => Teacher.fromJson(json.decode(str));
+
+    // String toRawJson() => json.encode(toJson());
+
+    factory Teacher.fromJson(Map<String, dynamic> json) => Teacher(
         teacherClass: json["class"],
-        subject: List<String>.from(json["subjects"].map((x) => x)),
-      );
+        stream: json["stream"],
+        subjects: List<Subject>.from(json["subjects"].map((x) => Subject.fromJson(x))),
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "class": teacherClass,
-        "subjects": List<dynamic>.from(subject.map((x) => x)),
-      };
+        "stream": stream,
+        "subjects": List<dynamic>.from(subjects.map((x) => x.toJson())),
+    };
 }
+
+class Subject {
+    Subject({
+        required this.classId,
+        required this.batch,
+        required this.lectureId,
+        required this.name,
+    });
+
+    final String classId;
+    final int batch;
+    final String lectureId;
+    final String name;
+
+    Subject copyWith({
+        String? classId,
+        int? batch,
+        String? lectureId,
+        String? name,
+    }) => 
+        Subject(
+            classId: classId ?? this.classId,
+            batch: batch ?? this.batch,
+            lectureId: lectureId ?? this.lectureId,
+            name: name ?? this.name,
+        );
+
+    // factory Subject.fromRawJson(String str) => Subject.fromJson(json.decode(str));
+
+    // String toRawJson() => json.encode(toJson());
+
+    factory Subject.fromJson(Map<String, dynamic> json) => Subject(
+        classId: json["classId"],
+        batch: json["batch"],
+        lectureId: json["lectureId"],
+        name: json["name"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "classId": classId,
+        "batch": batch,
+        "lectureId": lectureId,
+        "name": name,
+    };
+}
+
 
 //Modals for Chapter Notes
 List<Notes> notesfrom(json) =>
@@ -100,15 +202,18 @@ List<Map<String, dynamic>> topicsto(List<Topics> subj) =>
 class Topics {
   Topics({
     required this.topic,
+    required this.link,
     required this.id,
     required this.file,
   });
   late final String topic;
+  late final String link;
   late final String id;
   late final FileClass file;
 
   Topics.fromJson(Map<String, dynamic> json) {
     topic = json['name'];
+    link = json['youtubeLink'];
     id = json['_id'];
     file = FileClass.fromJson(json['file']);
   }
@@ -116,6 +221,7 @@ class Topics {
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['name'] = topic;
+    _data['youtubeLink'] = link;
     _data['_id'] = id;
     _data['file'] = file.toJson();
     return _data;
